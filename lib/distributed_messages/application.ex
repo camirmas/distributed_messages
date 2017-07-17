@@ -11,7 +11,7 @@ defmodule DistributedMessages.Application do
     # Define workers and child supervisors to be supervised
     children = [
       # Starts a worker by calling: DistributedMessages.Worker.start_link(arg1, arg2, arg3)
-      # worker(DistributedMessages.Worker, [arg1, arg2, arg3]),
+      worker(DistributedMessages.Router, []),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
