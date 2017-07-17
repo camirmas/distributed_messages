@@ -8,6 +8,9 @@ defmodule DistributedMessages.Application do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
+    Application.get_env(:distributed_messages, :cookie)
+    |> Node.set_cookie
+
     # Define workers and child supervisors to be supervised
     children = [
       # Starts a worker by calling: DistributedMessages.Worker.start_link(arg1, arg2, arg3)
