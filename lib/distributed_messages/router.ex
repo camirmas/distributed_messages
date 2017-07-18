@@ -25,7 +25,7 @@ defmodule DistributedMessages.Router do
       :no_node ->
         not_found_error()
       _ ->
-        GenServer.call({__MODULE__, node}, {:send_message, message})
+        GenServer.call({__MODULE__, node}, {:send_message, Node.self, message})
     end
   end
 
@@ -44,8 +44,9 @@ defmodule DistributedMessages.Router do
     end
   end
 
-  def handle_call({:send_message, message}, _from, state) do
-    IO.puts message
+  def handle_call({:send_message, from_node, message}, _from, state) do
+    name = shorten_node(from_node)
+    IO.puts "\n#{name}: #{message}"
 
     {:reply, :ok, state}
   end
@@ -65,6 +66,12 @@ defmodule DistributedMessages.Router do
       (node == list_node) ||
       (node == shorten_node(list_node))
     end)
+  end
+
+  defp shorten_node(node) when is_atom(node) do
+    node
+    |> Atom.to_string
+    |> shorten_node
   end
 
   defp shorten_node(node) when is_binary(node) do
