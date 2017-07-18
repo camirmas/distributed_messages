@@ -25,15 +25,19 @@ defmodule DistributedMessages.Router do
       :no_node ->
         not_found_error()
       _ ->
-        GenServer.call({__MODULE__, node}, {:send_message, Node.self, message})
+        GenServer.cast({__MODULE__, node}, {:send_message, Node.self, message})
     end
   end
 
-  # Callbacks
-
-  def init(_) do
-    {:ok, %{}}
+  @doc """
+  Sends a message to all connected Nodes.
+  """
+  def broadcast_message(message) do
+    Node.list
+    |> Enum.map(&(send_message(&1, message)))
   end
+
+  # Callbacks
 
   def handle_call({:connect, node}, _from, state) do
     case Node.connect(node) do
@@ -44,11 +48,11 @@ defmodule DistributedMessages.Router do
     end
   end
 
-  def handle_call({:send_message, from_node, message}, _from, state) do
+  def handle_cast({:send_message, from_node, message}, state) do
     name = shorten_node(from_node)
     IO.puts "\n#{name}: #{message}"
 
-    {:reply, :ok, state}
+    {:noreply, state}
   end
 
   # Private
