@@ -8,8 +8,7 @@ defmodule DistributedMessages.Application do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
-    Application.get_env(:distributed_messages, :cookie)
-    |> Node.set_cookie
+    set_cookie()
 
     # Define workers and child supervisors to be supervised
     children = [
@@ -21,5 +20,16 @@ defmodule DistributedMessages.Application do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: DistributedMessages.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  # Don't attempt to set cookie if no Node.
+  defp set_cookie do
+    case Node.self do
+      :"nonode@nohost" ->
+        nil
+      _ ->
+        Application.get_env(:distributed_messages, :cookie)
+        |> Node.set_cookie
+    end
   end
 end
