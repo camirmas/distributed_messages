@@ -14,7 +14,7 @@ defmodule DistributedMessages.Router do
   Connects to a given Node.
   """
   def connect(node) do
-    GenServer.call(__MODULE__, {:connect, node})
+    GenServer.call(__MODULE__, {:connect, node}, 10000)
   end
 
   @doc """
